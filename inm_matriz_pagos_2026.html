@@ -18,6 +18,7 @@
     --fs: min(1.05vw, 1.74vh);
     --rojo: #6a1b9a;   /* --rojo: #e0002 dpuntos y etiquetas de cuota (institucional) */
     --azul: #002452;   /* totales mensuales y media (institucional) */
+    --acento: #0097a7; /* marca del total mensual y fondo del tooltip */
     --gris: #55585a;   /* títulos de eje */
     --gris-t: #5e7e8b; /* texto de eje */
     color-scheme: light;
@@ -72,7 +73,7 @@
 
   /* Marca del total mensual leída en el eje derecho (equiv. geom_segment) */
   .ov { position: absolute; inset: 0; pointer-events: none; }
-  .seg { position: absolute; width: 5%; height: 2px; background: var(--azul); transform: translateY(-50%); }
+  .seg { position: absolute; width: 5%; height: 2px; background: var(--acento); transform: translateY(-50%); }
 
   /* --- Fila de totales mensuales y nombres de mes --- */
   .row12 { grid-column: 3; display: grid; grid-template-columns: repeat(12, 1fr); }
@@ -93,7 +94,7 @@
   .c-diag { cursor: help; }
   .c-diag:hover { z-index: 10; } /* .c es position:relative, así el tooltip tapa a sus vecinas */
   .tip { position: absolute; left: 50%; transform: translateX(-50%); z-index: 20;
-         padding: .5em .7em; border-radius: 4px; background: var(--azul); color: #fff;
+         padding: .5em .7em; border-radius: 4px; background: var(--acento); color: #fff;
          font-size: .78em; line-height: 1.45; text-align: left; white-space: nowrap;
          box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
          opacity: 0; visibility: hidden; transition: opacity .12s ease;
