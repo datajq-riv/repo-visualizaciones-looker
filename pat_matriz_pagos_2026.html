@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Matriz de Pagos 2026</title>
+<style>
+  /* Unidad base de la que escala TODO el gráfico. Se toma la dimensión
+     LIMITANTE del viewport (= del iframe en Looker), no sólo el ancho:
+       - 1.05vw  -> el ancho manda (contenedores más altos que anchos)
+       - 1.74vh  -> el alto manda (contenedores apaisados)
+     El contenido mide 95,24 x --fs de ancho por 56,75 x --fs de alto (medido).
+     Para que quepa de alto: --fs <= 100vh / 56,75 = 1,762vh; se usa 1,74vh
+     para dejar margen y que ningún redondeo dispare la barra de scroll.
+     Así el gráfico entra entero en cualquier proporción de componente. */
+  :root {
+    --fs: min(1.05vw, 1.74vh);
+    --purpura: #6a1b9a;   /* puntos y etiquetas de cuota (institucional) */
+    --azul: #002452;   /* totales mensuales y media (institucional) */
+    --acento: #880e4f; /* marca del total mensual y fondo del tooltip */
+    --gris: #55585a;   /* títulos de eje */
+    --gris-t: #5e7e8b; /* texto de eje */
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: #fff;
+    overflow-x: hidden; /* Looker no ajusta el iframe: nunca scroll horizontal */
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: var(--fs);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Centra el gráfico en el viewport cuando sobra espacio en algún eje.
+     El centrado se hace con `margin:auto` en el hijo (no con align-items),
+     que es la variante que no recorta si el contenido llegara a desbordar. */
+  body { display: flex; min-height: 100vh; }
+  /* Ancho tope expresado en em, o sea en múltiplos de --fs: cuando --fs se
+     achica porque manda el alto, el gráfico se angosta en la misma proporción
+     y conserva su forma en vez de estirarse a lo ancho del contenedor. */
+  .mzp { width: 100%; max-width: 95.24em; margin: auto; padding: 1.8em 2em 1.4em; }
+
+  /* --- Cuerpo: [eje cuota] [panel] [eje total mensual] --- */
+  .body { display: grid; grid-template-columns: auto auto 1fr auto auto; align-items: stretch; }
+  .ytit { writing-mode: vertical-rl; transform: rotate(180deg); align-self: center;
+          color: var(--gris); font-size: 1.05em; padding: 0 .4em; }
+  .yaxis { display: grid; grid-template-rows: repeat(12, 3.6em); }
+  .yl { display: flex; align-items: center; justify-content: flex-end;
+        color: var(--gris-t); font-size: .95em; padding: 0 .5em; }
+  /* Eje derecho: breaks redondos posicionados por %, no una etiqueta por fila */
+  .yaxis-der { position: relative; min-width: 4.2em; }
+  .yr { position: absolute; left: 0; transform: translateY(-50%); padding-left: .6em;
+        color: var(--gris-t); font-size: .95em; white-space: nowrap; }
+
+  /* --- Panel de la matriz: 12 meses x 12 cuotas --- */
+  .panel { position: relative; display: grid;
+           grid-template-columns: repeat(12, 1fr); grid-template-rows: repeat(12, 3.6em);
+           border-bottom: 1px solid #e6e6e6; }
+  /* Grilla de fondo (equiv. theme_minimal): cada celda dibuja su cruz centrada,
+     y al cubrir el 100% de su ancho/alto las líneas quedan continuas. */
+  .c { position: relative;
+       background-image:
+         linear-gradient(to bottom, transparent calc(50% - .5px), #ececec calc(50% - .5px), #ececec calc(50% + .5px), transparent calc(50% + .5px)),
+         linear-gradient(to right,  transparent calc(50% - .5px), #f4f4f4 calc(50% - .5px), #f4f4f4 calc(50% + .5px), transparent calc(50% + .5px)); }
+  .c-in { position: absolute; inset: 0; } /* portador de la opacidad ∝ cantidad */
+  .c-pt { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+          width: .72em; height: .72em; border-radius: 50%; background: var(--purpura); }
+  .c-lbl { position: absolute; right: calc(50% + .6em); top: 50%; transform: translateY(-50%);
+           display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15;
+           color: var(--purpura); white-space: nowrap; }
+  .c-lbl b { font-size: .82em; font-weight: 600; }
+  .c-lbl i { font-size: .74em; font-style: normal; opacity: .85; }
+
+  /* Marca del total mensual leída en el eje derecho (equiv. geom_segment) */
+  .ov { position: absolute; inset: 0; pointer-events: none; }
+  .seg { position: absolute; width: 5%; height: 2px; background: var(--acento); transform: translateY(-50%); }
+
+  /* --- Fila de totales mensuales y nombres de mes --- */
+  .row12 { grid-column: 3; display: grid; grid-template-columns: repeat(12, 1fr); }
+  .tot { text-align: center; color: var(--azul); font-size: 1em; font-weight: 600; padding: .55em 0 .15em; }
+  .mes { text-align: center; color: var(--gris-t); font-size: .92em; padding-bottom: .2em; }
+  .xtit { grid-column: 3; text-align: center; color: var(--gris); font-size: 1.05em; padding-top: .3em; }
+
+  /* --- Pie: media mensual, leyenda de opacidad, nota de área --- */
+  .media { text-align: center; margin: 1em 0 .8em; }
+  .media span { display: inline-block; border: 1px solid #d5d5d5; border-radius: 3px;
+                padding: .35em .8em; color: var(--azul); font-size: 1em; background: #fff; }
+  .leg { display: flex; align-items: center; justify-content: center; gap: .6em;
+         color: var(--gris); font-size: .88em; }
+  .leg-bar { width: 22%; height: .7em; border-radius: 2px;
+             background: linear-gradient(90deg, rgba(106,27,154,.3), rgba(106,27,154,1)); }
+
+  /* --- Tooltip sobre la diagonal (pago en término). CSS puro, sin JS. --- */
+  .c-diag { cursor: help; }
+  .c-diag:hover { z-index: 10; } /* .c es position:relative, así el tooltip tapa a sus vecinas */
+  .tip { position: absolute; left: 50%; transform: translateX(-50%); z-index: 20;
+         padding: .5em .7em; border-radius: 4px; background: var(--acento); color: #fff;
+         font-size: .98em; line-height: 1.45; text-align: left; white-space: nowrap;
+         box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+         opacity: 0; visibility: hidden; transition: opacity .12s ease;
+         pointer-events: none; /* el tooltip no se interpone al hover de la celda */ }
+  .c-diag:hover .tip { opacity: 1; visibility: visible; }
+  .tip b { display: block; font-size: 1.05em; margin-bottom: .15em; }
+  .tip i { font-style: normal; opacity: .82; }
+  /* Anclaje hacia adentro del panel para que ningún borde lo recorte */
+  .tip-abajo  { top: calc(50% + 1em); }
+  .tip-arriba { bottom: calc(50% + 1em); }
+  .tip-izq { left: 0; transform: none; }
+  .tip-der { left: auto; right: 0; transform: none; }
+</style>
+</head>
+<body>
+<div class="mzp">
+
+  <div class="body">
+    <div class="ytit">Cuota</div>
+    <div class="yaxis"><div class="yl">12</div>
+<div class="yl">11</div>
+<div class="yl">10</div>
+<div class="yl">9</div>
+<div class="yl">8</div>
+<div class="yl">7</div>
+<div class="yl">6</div>
+<div class="yl">5</div>
+<div class="yl">4</div>
+<div class="yl">3</div>
+<div class="yl">2</div>
+<div class="yl">1</div></div>
+
+    <div class="panel">
+      <div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>91</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>61</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>5</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>91</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>61</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>5</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>90</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>62</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>5</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>12</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>90</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>62</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>5</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>17</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>90</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>61</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>5</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.306"><span class="c-lbl"><b>104</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.413"><span class="c-lbl"><b>1.817</b><i>9%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.924"><span class="c-lbl"><b>9.985</b><i>59%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 8 · Agosto<br>9.985 pagos<br><i>59% de los pagos del mes</i></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>91</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>61</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>5</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.315"><span class="c-lbl"><b>249</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:1"><span class="c-lbl"><b>11.204</b><i>54%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 7 · Julio<br>11.204 pagos<br><i>54% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.419"><span class="c-lbl"><b>1.901</b><i>11%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>91</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>61</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>17</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.414"><span class="c-lbl"><b>1.829</b><i>10%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.938"><span class="c-lbl"><b>10.220</b><i>56%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 6 · Junio<br>10.220 pagos<br><i>56% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.427"><span class="c-lbl"><b>2.035</b><i>10%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.37"><span class="c-lbl"><b>1.124</b><i>7%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>92</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.303"><span class="c-lbl"><b>60</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>20</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.964"><span class="c-lbl"><b>10.623</b><i>60%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 5 · Mayo<br>10.623 pagos<br><i>60% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.461"><span class="c-lbl"><b>2.588</b><i>14%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.397"><span class="c-lbl"><b>1.563</b><i>8%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.361"><span class="c-lbl"><b>988</b><i>6%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>91</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>71</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.424"><span class="c-lbl"><b>1.988</b><i>11%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.9"><span class="c-lbl"><b>9.609</b><i>67%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 4 · Abril<br>9.609 pagos<br><i>67% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.421"><span class="c-lbl"><b>1.943</b><i>11%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.396"><span class="c-lbl"><b>1.533</b><i>8%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.374"><span class="c-lbl"><b>1.181</b><i>6%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.352"><span class="c-lbl"><b>838</b><i>5%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>91</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>72</b><i>1%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.973"><span class="c-lbl"><b>10.780</b><i>61%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 3 · Marzo<br>10.780 pagos<br><i>61% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.436"><span class="c-lbl"><b>2.180</b><i>15%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.385"><span class="c-lbl"><b>1.364</b><i>8%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.384"><span class="c-lbl"><b>1.351</b><i>7%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.365"><span class="c-lbl"><b>1.039</b><i>5%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.349"><span class="c-lbl"><b>792</b><i>5%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.405"><span class="c-lbl"><b>1.679</b><i>14%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.871"><span class="c-lbl"><b>9.136</b><i>71%</i></span><span class="c-pt"></span></span><span class="tip tip-arriba tip-izq"><b>Pago en término</b>Cuota 2 · Febrero<br>9.136 pagos<br><i>71% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.467"><span class="c-lbl"><b>2.676</b><i>15%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.383"><span class="c-lbl"><b>1.331</b><i>9%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.365"><span class="c-lbl"><b>1.040</b><i>6%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.368"><span class="c-lbl"><b>1.090</b><i>6%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.356"><span class="c-lbl"><b>896</b><i>4%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.344"><span class="c-lbl"><b>714</b><i>4%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.871"><span class="c-lbl"><b>9.139</b><i>78%</i></span><span class="c-pt"></span></span><span class="tip tip-arriba tip-izq"><b>Pago en término</b>Cuota 1 · Enero<br>9.139 pagos<br><i>78% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.489"><span class="c-lbl"><b>3.029</b><i>24%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.429"><span class="c-lbl"><b>2.076</b><i>12%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.372"><span class="c-lbl"><b>1.152</b><i>8%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.358"><span class="c-lbl"><b>927</b><i>5%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.361"><span class="c-lbl"><b>986</b><i>5%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.353"><span class="c-lbl"><b>847</b><i>4%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.343"><span class="c-lbl"><b>690</b><i>4%</i></span><span class="c-pt"></span></span></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+<div class="c"></div>
+      <div class="ov"><span class="seg" style="left:1.667%;top:77.76%"></span>
+<span class="seg" style="left:10%;top:75.34%"></span>
+<span class="seg" style="left:18.333%;top:64.22%"></span>
+<span class="seg" style="left:26.667%;top:71.87%"></span>
+<span class="seg" style="left:35%;top:64.24%"></span>
+<span class="seg" style="left:43.333%;top:63.35%"></span>
+<span class="seg" style="left:51.667%;top:57.81%"></span>
+<span class="seg" style="left:60%;top:65.74%"></span></div>
+    </div>
+
+    <div class="yaxis-der"><span class="yr" style="top:81.644%">10.000</span>
+<span class="yr" style="top:59.122%">20.000</span>
+<span class="yr" style="top:36.599%">30.000</span>
+<span class="yr" style="top:14.077%">40.000</span></div>
+    <div class="ytit">Cantidad Mensual de Pagos</div>
+
+    <div class="row12"><div class="tot">11.726</div>
+<div class="tot">12.797</div>
+<div class="tot">17.736</div>
+<div class="tot">14.339</div>
+<div class="tot">17.726</div>
+<div class="tot">18.121</div>
+<div class="tot">20.582</div>
+<div class="tot">17.061</div>
+<div class="tot"></div>
+<div class="tot"></div>
+<div class="tot"></div>
+<div class="tot"></div></div>
+    <div class="row12"><div class="mes">Enero</div>
+<div class="mes">Febrero</div>
+<div class="mes">Marzo</div>
+<div class="mes">Abril</div>
+<div class="mes">Mayo</div>
+<div class="mes">Junio</div>
+<div class="mes">Julio</div>
+<div class="mes">Agosto</div>
+<div class="mes">Septiembre</div>
+<div class="mes">Octubre</div>
+<div class="mes">Noviembre</div>
+<div class="mes">Diciembre</div></div>
+    <div class="xtit">Mes</div>
+  </div>
+
+  <div class="media"><span>Media Mensual de Cantidad de Pagos: 16.261</span></div>
+
+  <div class="leg">
+    <span>Cantidad de Pagos</span>
+    <span>5</span>
+    <span class="leg-bar"></span>
+    <span>11.204</span>
+  </div>
+
+</div>
+</body>
+</html>
