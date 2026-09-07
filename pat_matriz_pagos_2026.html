@@ -63,7 +63,9 @@
 
   /* --- Contenedor del gráfico (columna derecha) --- */
   .card { display: flex; background: #fff; padding: 1.2em;
-          border: 1px solid var(--linea); border-top: 2px solid var(--acento); }
+          /* Marco completo en el color de la contribución. Grosor y radio en em
+             (no px) para que escalen con --fs junto al resto del documento. */
+          border: .16em solid var(--acento); border-radius: .7em; }
   .mzp { width: 100%; max-width: 95.24em; margin: auto; padding: 1.8em 2em 1.4em; }
 
   /* --- Cuerpo: [eje cuota] [panel] [eje total mensual] --- */
@@ -150,7 +152,7 @@
   <p class="desc">Comportamiento del pago en cuotas durante los meses del ejercicio actual.</p>
 
   <div class="meta">
-    Actualización 31-08-2026<br>
+    Actualización 07-09-2026<br>
     ID 02.21.05
   </div>
 </aside>
@@ -205,8 +207,8 @@
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
-<div class="c"><span class="c-in" style="opacity:0.3"><span class="c-lbl"><b>12</b><i>0%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>14</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.311"><span class="c-lbl"><b>181</b><i>10%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -217,8 +219,8 @@
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
-<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>17</b><i>0%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>21</b><i>0%</i></span><span class="c-pt"></span></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.342"><span class="c-lbl"><b>679</b><i>36%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 9 · Septiembre<br>679 pagos<br><i>36% de los pagos del mes</i></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -229,8 +231,8 @@
 <div class="c"></div>
 <div class="c"><span class="c-in" style="opacity:0.306"><span class="c-lbl"><b>104</b><i>1%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.413"><span class="c-lbl"><b>1.817</b><i>9%</i></span><span class="c-pt"></span></span></div>
-<div class="c c-diag"><span class="c-in" style="opacity:0.924"><span class="c-lbl"><b>9.985</b><i>59%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 8 · Agosto<br>9.985 pagos<br><i>59% de los pagos del mes</i></span></div>
-<div class="c"></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.939"><span class="c-lbl"><b>10.227</b><i>57%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 8 · Agosto<br>10.227 pagos<br><i>57% de los pagos del mes</i></span></div>
+<div class="c"><span class="c-in" style="opacity:0.319"><span class="c-lbl"><b>309</b><i>16%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -241,8 +243,8 @@
 <div class="c"></div>
 <div class="c"><span class="c-in" style="opacity:0.315"><span class="c-lbl"><b>249</b><i>1%</i></span><span class="c-pt"></span></span></div>
 <div class="c c-diag"><span class="c-in" style="opacity:1"><span class="c-lbl"><b>11.204</b><i>54%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 7 · Julio<br>11.204 pagos<br><i>54% de los pagos del mes</i></span></div>
-<div class="c"><span class="c-in" style="opacity:0.419"><span class="c-lbl"><b>1.901</b><i>11%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.427"><span class="c-lbl"><b>2.042</b><i>11%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.312"><span class="c-lbl"><b>189</b><i>10%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -253,8 +255,8 @@
 <div class="c"><span class="c-in" style="opacity:0.414"><span class="c-lbl"><b>1.829</b><i>10%</i></span><span class="c-pt"></span></span></div>
 <div class="c c-diag"><span class="c-in" style="opacity:0.938"><span class="c-lbl"><b>10.220</b><i>56%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 6 · Junio<br>10.220 pagos<br><i>56% de los pagos del mes</i></span></div>
 <div class="c"><span class="c-in" style="opacity:0.427"><span class="c-lbl"><b>2.035</b><i>10%</i></span><span class="c-pt"></span></span></div>
-<div class="c"><span class="c-in" style="opacity:0.37"><span class="c-lbl"><b>1.124</b><i>7%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.376"><span class="c-lbl"><b>1.223</b><i>7%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.308"><span class="c-lbl"><b>137</b><i>7%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -263,22 +265,22 @@
 <div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>27</b><i>0%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.301"><span class="c-lbl"><b>20</b><i>0%</i></span><span class="c-pt"></span></span></div>
 <div class="c c-diag"><span class="c-in" style="opacity:0.964"><span class="c-lbl"><b>10.623</b><i>60%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 5 · Mayo<br>10.623 pagos<br><i>60% de los pagos del mes</i></span></div>
-<div class="c"><span class="c-in" style="opacity:0.461"><span class="c-lbl"><b>2.588</b><i>14%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.461"><span class="c-lbl"><b>2.587</b><i>14%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.397"><span class="c-lbl"><b>1.563</b><i>8%</i></span><span class="c-pt"></span></span></div>
-<div class="c"><span class="c-in" style="opacity:0.361"><span class="c-lbl"><b>988</b><i>6%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.367"><span class="c-lbl"><b>1.078</b><i>6%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.306"><span class="c-lbl"><b>105</b><i>6%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>91</b><i>1%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>71</b><i>1%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.424"><span class="c-lbl"><b>1.988</b><i>11%</i></span><span class="c-pt"></span></span></div>
-<div class="c c-diag"><span class="c-in" style="opacity:0.9"><span class="c-lbl"><b>9.609</b><i>67%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 4 · Abril<br>9.609 pagos<br><i>67% de los pagos del mes</i></span></div>
+<div class="c c-diag"><span class="c-in" style="opacity:0.9"><span class="c-lbl"><b>9.608</b><i>67%</i></span><span class="c-pt"></span></span><span class="tip tip-abajo"><b>Pago en término</b>Cuota 4 · Abril<br>9.608 pagos<br><i>67% de los pagos del mes</i></span></div>
 <div class="c"><span class="c-in" style="opacity:0.421"><span class="c-lbl"><b>1.943</b><i>11%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.396"><span class="c-lbl"><b>1.533</b><i>8%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.374"><span class="c-lbl"><b>1.181</b><i>6%</i></span><span class="c-pt"></span></span></div>
-<div class="c"><span class="c-in" style="opacity:0.352"><span class="c-lbl"><b>838</b><i>5%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.357"><span class="c-lbl"><b>913</b><i>5%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>87</b><i>5%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -289,8 +291,8 @@
 <div class="c"><span class="c-in" style="opacity:0.385"><span class="c-lbl"><b>1.364</b><i>8%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.384"><span class="c-lbl"><b>1.351</b><i>7%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.365"><span class="c-lbl"><b>1.039</b><i>5%</i></span><span class="c-pt"></span></span></div>
-<div class="c"><span class="c-in" style="opacity:0.349"><span class="c-lbl"><b>792</b><i>5%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.354"><span class="c-lbl"><b>861</b><i>5%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.305"><span class="c-lbl"><b>77</b><i>4%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -301,8 +303,8 @@
 <div class="c"><span class="c-in" style="opacity:0.365"><span class="c-lbl"><b>1.040</b><i>6%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.368"><span class="c-lbl"><b>1.090</b><i>6%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.356"><span class="c-lbl"><b>896</b><i>4%</i></span><span class="c-pt"></span></span></div>
-<div class="c"><span class="c-in" style="opacity:0.344"><span class="c-lbl"><b>714</b><i>4%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.348"><span class="c-lbl"><b>775</b><i>4%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>67</b><i>4%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -313,8 +315,8 @@
 <div class="c"><span class="c-in" style="opacity:0.358"><span class="c-lbl"><b>927</b><i>5%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.361"><span class="c-lbl"><b>986</b><i>5%</i></span><span class="c-pt"></span></span></div>
 <div class="c"><span class="c-in" style="opacity:0.353"><span class="c-lbl"><b>847</b><i>4%</i></span><span class="c-pt"></span></span></div>
-<div class="c"><span class="c-in" style="opacity:0.343"><span class="c-lbl"><b>690</b><i>4%</i></span><span class="c-pt"></span></span></div>
-<div class="c"></div>
+<div class="c"><span class="c-in" style="opacity:0.346"><span class="c-lbl"><b>746</b><i>4%</i></span><span class="c-pt"></span></span></div>
+<div class="c"><span class="c-in" style="opacity:0.304"><span class="c-lbl"><b>69</b><i>4%</i></span><span class="c-pt"></span></span></div>
 <div class="c"></div>
 <div class="c"></div>
 <div class="c"></div>
@@ -323,9 +325,10 @@
 <span class="seg" style="left:18.333%;top:64.22%"></span>
 <span class="seg" style="left:26.667%;top:71.87%"></span>
 <span class="seg" style="left:35%;top:64.24%"></span>
-<span class="seg" style="left:43.333%;top:63.35%"></span>
+<span class="seg" style="left:43.333%;top:63.36%"></span>
 <span class="seg" style="left:51.667%;top:57.81%"></span>
-<span class="seg" style="left:60%;top:65.74%"></span></div>
+<span class="seg" style="left:60%;top:63.85%"></span>
+<span class="seg" style="left:68.333%;top:99.89%"></span></div>
     </div>
 
     <div class="yaxis-der"><span class="yr" style="top:81.644%">10.000</span>
@@ -337,12 +340,12 @@
     <div class="row12"><div class="tot">11.726</div>
 <div class="tot">12.797</div>
 <div class="tot">17.736</div>
-<div class="tot">14.339</div>
+<div class="tot">14.338</div>
 <div class="tot">17.726</div>
-<div class="tot">18.121</div>
+<div class="tot">18.120</div>
 <div class="tot">20.582</div>
-<div class="tot">17.061</div>
-<div class="tot"></div>
+<div class="tot">17.900</div>
+<div class="tot">1.900</div>
 <div class="tot"></div>
 <div class="tot"></div>
 <div class="tot"></div></div>
@@ -361,7 +364,7 @@
     <div class="xtit">Mes</div>
   </div>
 
-  <div class="media"><span>Media Mensual de Cantidad de Pagos: 16.261</span></div>
+  <div class="media"><span>Media Mensual de Cantidad de Pagos: 14.758</span></div>
 
   <div class="leg">
     <span>Cantidad de Pagos</span>
